@@ -21,31 +21,62 @@ type CellDetails struct {
 
 func main() {
 	fmt.Println("Game of life")
+
 	data := [][]int{
-		{1, 0, 0},
-		{0, 1, 0},
+		{0, 1, 1},
+		{1, 1, 1},
 		{0, 0, 1},
 	}
 
-	newGeneration := [][]int{
-		{1, 0, 0},
-		{0, 1, 0},
-		{0, 0, 1},
+	m := 3
+
+	newGeneration := make([][]int, m)
+
+	for i := 0; i < m; i++ {
+		newGeneration[i] = make([]int, m)
 	}
-	gameOfLife := &CurrentGeneration{data}
+
+	gameOfLife := &CurrentGeneration{
+		data,
+	}
 
 	for i, row := range data {
 		for j := range row {
 			cellIndex := [2]int{i, j}
 			cell := gameOfLife.getNeighbours(cellIndex)
 			cell.Transition()
-
 			newGeneration[i][j] = cell.NewGeneration
 
 		}
 		fmt.Println()
 	}
-	fmt.Println(newGeneration)
+
+	print(data)
+	fmt.Println("--------------")
+	print(newGeneration)
+}
+func printStar(data [][]int) {
+	fmt.Println()
+	fmt.Println()
+	for i := range data {
+		for j := range data[i] {
+			if data[i][j] == 0 {
+				fmt.Print(".")
+			} else {
+				fmt.Print("*")
+			}
+			fmt.Print("")
+		}
+		fmt.Println()
+	}
+}
+
+func print(data [][]int) {
+	fmt.Println()
+	fmt.Println()
+	for _, row := range data {
+		fmt.Println(row)
+	}
 }
 
 func (g *CurrentGeneration) getNeighbours(cell [2]int) *CellDetails {
@@ -93,6 +124,7 @@ func (g *CurrentGeneration) getNeighbours(cell [2]int) *CellDetails {
 		TotalNoOfDeadNeighbour: countOfDeadCells,
 		TotalNoOfLiveNeighbour: countOfLiveCells,
 		CurrentGeneration:      g.Matrix[cell[0]][cell[1]], CurrentGenerationCellIndex: cell}
+
 	return neighbourDetails
 }
 
@@ -107,7 +139,7 @@ func (cell *CellDetails) Transition() {
 		//Any live cell with more than three live neighbours dies, as if by overpopulation.
 		if cell.TotalNoOfLiveNeighbour < 2 {
 			cell.NewGeneration = 0
-		} else if cell.TotalNoOfLiveNeighbour >= 2 && cell.TotalNoOfLiveNeighbour <= 3 {
+		} else if cell.TotalNoOfLiveNeighbour == 2 || cell.TotalNoOfLiveNeighbour == 3 {
 			cell.NewGeneration = 1
 		} else if cell.TotalNoOfLiveNeighbour > 3 {
 			cell.NewGeneration = 0
@@ -120,4 +152,5 @@ func (cell *CellDetails) Transition() {
 			cell.NewGeneration = 1
 		}
 	}
+
 }
