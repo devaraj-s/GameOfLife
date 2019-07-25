@@ -4,10 +4,12 @@ import (
 	"fmt"
 )
 
-type GameOfLife struct {
+//CurrentGeneration - cells current generation data
+type CurrentGeneration struct {
 	Matrix [][]int
 }
 
+//CellDetails - each cell details
 type CellDetails struct {
 	CurrentGenerationCellIndex [2]int
 	CurrentGeneration          int
@@ -30,25 +32,23 @@ func main() {
 		{0, 1, 0},
 		{0, 0, 1},
 	}
-	gameOfLife := &GameOfLife{data}
+	gameOfLife := &CurrentGeneration{data}
 
 	for i, row := range data {
-		for j, _ := range row {
+		for j := range row {
 			cellIndex := [2]int{i, j}
 			cell := gameOfLife.getNeighbours(cellIndex)
 			cell.Transition()
 
-			//fmt.Printf("Cell details %v -> %+v\n", data[i][j], cell)
 			newGeneration[i][j] = cell.NewGeneration
 
 		}
 		fmt.Println()
 	}
-	//fmt.Println(data)
 	fmt.Println(newGeneration)
 }
 
-func (g *GameOfLife) getNeighbours(cell [2]int) *CellDetails {
+func (g *CurrentGeneration) getNeighbours(cell [2]int) *CellDetails {
 
 	rowIndex := cell[0]
 	columnIndex := cell[1]
@@ -59,6 +59,8 @@ func (g *GameOfLife) getNeighbours(cell [2]int) *CellDetails {
 	for i := (rowIndex - 1); i <= rowIndex+1; i++ {
 		neighboursColIndex := 0
 		for j := (columnIndex - 1); j <= columnIndex+1; j++ {
+
+			//assuming a 3x3 matrix
 			if i == -1 || i == len(g.Matrix) {
 				neighbours[neighboursRowIndex] = [3]int{-1, -1, -1}
 				continue
@@ -74,6 +76,8 @@ func (g *GameOfLife) getNeighbours(cell [2]int) *CellDetails {
 				if i == rowIndex && j == columnIndex {
 					continue
 				}
+
+				//counting the live and dead neighbours
 				if cell == 0 {
 					countOfDeadCells++
 				} else {
@@ -92,7 +96,7 @@ func (g *GameOfLife) getNeighbours(cell [2]int) *CellDetails {
 	return neighbourDetails
 }
 
-//Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+//Transition - cell Transition to new generation
 func (cell *CellDetails) Transition() {
 
 	//if current generation is live
